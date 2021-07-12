@@ -1,3 +1,4 @@
+import { apiBaseUrl } from "../constants";
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -13,7 +14,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			user: null,
+			accessToken: null
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -41,6 +44,27 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+			signInUser: signInParams => {
+				let raw = JSON.stringify(signInParams);
+
+				let requestOptions = {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: raw
+				};
+
+				fetch(apiBaseUrl + "/api/sign_in", requestOptions)
+					.then(response => response.json())
+					.then(data => {
+						debugger;
+						setStore({ accessToken: data["accessToken"] });
+					})
+					.catch(error => console.log("error", error));
+			},
+			isUserAuthenticated: () => {
+				const store = getStore();
+				return store.accessToken !== null;
 			}
 		}
 	};
